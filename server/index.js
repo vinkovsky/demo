@@ -6,6 +6,7 @@ import { registerValidator } from "./validatios/auth.js";
 import { validationResult } from "express-validator";
 import UserModel from "./models/User.js";
 import checkAuth from "./utils/checkAuth.js";
+import cors from "cors";
 
 mongoose
   .connect(
@@ -19,6 +20,8 @@ mongoose
 const app = express();
 
 app.use(express.json());
+
+app.use(cors({ origin: "*" }));
 
 app.post("/auth/login", async (req, res) => {
   try {
@@ -99,7 +102,7 @@ app.post("/auth/register", registerValidator, async (req, res) => {
 
 app.get("/auth/me", checkAuth, async (req, res) => {
   try {
-    const user = await User.findByID(req.user._id);
+    const user = await UserModel.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({
@@ -112,7 +115,7 @@ app.get("/auth/me", checkAuth, async (req, res) => {
     res.json({ userData });
   } catch (err) {
     console.log(err);
-    res.status(500).json({
+    res.status(505).json({
       message: "Ne udalos` zaregat`sya",
     });
   }
